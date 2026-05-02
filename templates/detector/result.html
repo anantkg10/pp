@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction {{ prediction.pk }}{% endblock %}
+
+{% block content %}
+<section class="result-header">
+    <div>
+        <p class="eyebrow">Prediction {{ prediction.pk }}</p>
+        <h1>{{ prediction.predicted_type }}</h1>
+        <p class="lede">{{ prediction.disclaimer }}</p>
+    </div>
+    <a class="secondary-link" href="{% url 'detector-home' %}">Analyze another MRI</a>
+</section>
+
+<section class="result-layout">
+    <div class="image-stack-card">
+        <div class="image-stack">
+            <img src="{{ prediction.processed_image.url|default:prediction.upload_image.url }}" alt="Processed MRI image" class="scan-image">
+            {% if prediction.overlay_image %}
+            <img src="{{ prediction.overlay_image.url }}" alt="Tumor overlay" class="overlay-image">
+            {% endif %}
+        </div>
+        <div class="stack-caption">
+            <span>Original and highlighted tumor region</span>
+            <span>Backend: {{ prediction.backend }}</span>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="metric-grid">
+            <div class="metric">
+                <span class="metric-label">Tumor detected</span>
+                <strong>{% if prediction.tumor_detected %}Yes{% else %}No{% endif %}</strong>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Confidence</span>
+                <strong>{{ prediction.confidence|floatformat:2 }}</strong>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Highlighted area</span>
+                <strong>{{ prediction.area_percent|floatformat:2 }}%</strong>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Predicted type</span>
+                <strong>{{ prediction.predicted_type }}</strong>
+            </div>
+        </div>
+
+        {% if low_confidence %}
+        <div class="alert low-confidence">
+            Confidence is below the warning threshold. Review this result cautiously and do not treat it as a final clinical interpretation.
+        </div>
+        {% endif %}
+
+        <div class="detail-block">
+            <h2>Location summary</h2>
+            <p>{{ prediction.location_summary }}</p>
+        </div>
+        <div class="detail-block">
+            <h2>Size summary</h2>
+            <p>{{ prediction.size_summary }}</p>
+        </div>
+        <div class="detail-block">
+            <h2>Bounding metadata</h2>
+            <code>{{ prediction.bbox }}</code>
+        </div>
+    </div>
+</section>
+{% endblock %}

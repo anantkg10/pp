@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Prototype Research Workflow</p>
+        <h1>Brain MRI Tumor Detection</h1>
+        <p class="lede">
+            Upload a brain MRI slice to generate a tumor-presence estimate, highlight the suspected
+            region, and receive a type/location summary with confidence scoring.
+        </p>
+        <p class="warning">
+            This tool is for educational and research use only. It is not a final diagnosis.
+        </p>
+    </div>
+    <div class="hero-panel">
+        <h2>Upload MRI</h2>
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label for="{{ form.image.id_for_label }}">MRI image</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+            <div class="field-errors">{{ form.image.errors }}</div>
+            {% endif %}
+            <p class="field-help">{{ form.image.help_text }}</p>
+            <button type="submit">Run analysis</button>
+        </form>
+    </div>
+</section>
+
+<section class="info-grid">
+    <article class="info-card">
+        <h3>What the app returns</h3>
+        <p>Tumor-present status, prototype tumor type, confidence, location summary, and highlighted region overlay.</p>
+    </article>
+    <article class="info-card">
+        <h3>How highlighting works</h3>
+        <p>The interface stores the uploaded image plus a separate overlay so the suspect region can be emphasized without altering the original scan.</p>
+    </article>
+    <article class="info-card">
+        <h3>Upgrade path</h3>
+        <p>The service layer can switch from the demo backend to trained segmentation and classification checkpoints when they are available.</p>
+    </article>
+</section>
+
+<section class="recent-panel">
+    <div class="panel-header">
+        <h2>Recent predictions</h2>
+    </div>
+    {% if recent_predictions %}
+    <div class="prediction-list">
+        {% for prediction in recent_predictions %}
+        <a href="{% url 'prediction-result' prediction.pk %}" class="prediction-row">
+            <span>#{{ prediction.pk }}</span>
+            <span>{{ prediction.predicted_type|default:"Pending result" }}</span>
+            <span>{{ prediction.confidence|floatformat:2 }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No predictions yet. Upload a scan to create the first result.</p>
+    {% endif %}
+</section>
+{% endblock %}

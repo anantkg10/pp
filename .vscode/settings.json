@@ -1,0 +1,13 @@
+{
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "media": true,
+    "ml/datasets": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true,
+    "media": true,
+    "ml/datasets": true
+  }
+}
